@@ -3,18 +3,25 @@
 #include <actionlib/client/terminal_state.h>
 #include <assignment_2_2024/PlanningAction.h>
 
+#include <assignment_2_part1/state_pos_vel.h>		// including custom message
+#include <nav_msgs/Odometry.h>				// including odometry message
+
 // GLOBAL VARIABLES ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 float x_last_goal;
 float y_last_goal;
 int printNum = 0;
 
+// creating a publisher to publish the robot state
+ros::Publisher robot_state_pub;
+
+
 
 // feedback_callback: CALLBACK FUNCTION ------------------------------------------------------------------------------------------------------------------------
 
-
 void feedback_callback(const assignment_2_2024::PlanningFeedbackConstPtr &feedback)
 {
+	ros::spinOnce(); 		// Allow processing of subscriber callbacks
 	// setting threshold
 	float threshold = 0.5;
 	if ((abs(feedback->actual_pose.position.x - x_last_goal) < threshold) && (abs(feedback->actual_pose.position.y - y_last_goal) < threshold) && (printNum == 0))
@@ -24,12 +31,40 @@ void feedback_callback(const assignment_2_2024::PlanningFeedbackConstPtr &feedba
 	}
 }
 
+
+
+// odometry_callback: CALLBACK FUNCTION ------------------------------------------------------------------------------------------------------------------------
+
+// Callback for the /odom topic
+void odometry_callback(const nav_msgs::Odometry::ConstPtr &msg)
+{
+	// creating the custom message
+	assignment_2_part1::state_pos_vel state_message;
+	
+	// setting the message
+  	state_message.x = msg->pose.pose.position.x;
+    	state_message.y = msg->pose.pose.position.y;
+    	state_message.vel_x = msg->twist.twist.linear.x;
+    	state_message.vel_z = msg->twist.twist.angular.z;
+
+    	// publishing the custom message
+    	robot_state_pub.publish(state_message);
+}
+
+
 // MAIN ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 int main (int argc, char **argv)
 {
 	ros::init(argc, argv, "action_server_client");
 	ros::NodeHandle nh;
+	
+	// initializing the publisher for the robot state
+	robot_state_pub = nh.advertise<assignment_2_part1::state_pos_vel>("/robot_state", 10);
+
+  	// initializing the Subscriber for the /odom topic
+  	ros::Subscriber odom_sub = nh.subscribe("/odom", 10, odometry_callback);
+  	
 
 	// creating the action server client
 	actionlib::SimpleActionClient<assignment_2_2024::PlanningAction> ac("/reaching_goal", true);
