@@ -5,6 +5,7 @@
 
 #include <assignment_2_part1/state_pos_vel.h>		// including custom message
 #include <nav_msgs/Odometry.h>				// including odometry message
+#include <geometry_msgs/Point.h>			// including point message
 
 // GLOBAL VARIABLES ----------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -65,6 +66,9 @@ int main (int argc, char **argv)
   	// initializing the Subscriber for the /odom topic
   	ros::Subscriber odom_sub = nh.subscribe("/odom", 10, odometry_callback);
   	
+	// defining & initializing the publisher for the target coordinates
+	ros::Publisher target_coord_pub = nh.advertise<geometry_msgs::Point>("/target_coordinates", 10);
+
 
 	// creating the action server client
 	actionlib::SimpleActionClient<assignment_2_2024::PlanningAction> ac("/reaching_goal", true);
@@ -97,6 +101,18 @@ int main (int argc, char **argv)
   			// updating global variables: goal coordinates
 			x_last_goal = newGoal.target_pose.pose.position.x;
 			y_last_goal = newGoal.target_pose.pose.position.y;	
+			
+			
+			// defining the message for the target coordinates and 
+			geometry_msgs::Point target_coord_msg;
+			
+			// initializing the message target_coord_msg
+			target_coord_msg.x = newGoal.target_pose.pose.position.x;
+			target_coord_msg.y = newGoal.target_pose.pose.position.y;
+			
+			// publishing the message target_coord_msg
+    			target_coord_pub.publish(target_coord_msg);
+    			
 
 			// sending the message to the action server
   			ac.sendGoal(newGoal,

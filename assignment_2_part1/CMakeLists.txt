@@ -55,11 +55,10 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  target_coord.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -141,7 +140,7 @@ include_directories(
 
  add_executable(client_node src/action_server_client.cpp)
 
-
+ add_executable(last_target_service_node src/last_target_srv.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -166,6 +165,13 @@ include_directories(
  target_link_libraries(client_node
    ${catkin_LIBRARIES}
  )
+
+
+## Specify libraries to link a library or executable target against
+ target_link_libraries(last_target_service_node
+   ${catkin_LIBRARIES}
+ )
+
 
 
 
