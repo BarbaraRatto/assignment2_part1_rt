@@ -35,7 +35,7 @@ The node that does the following things:
 - allows the user to cancel the target, stopping the robot. If this happens, the message "The current goal has been canceled. The robot will stop." is written on the terminal;
 - allows the user to close the node;
 - permits to know when the target is reached, by reading the feedback message sent by the action server. If this happens, the message "The target has been reached!" is written on the terminal;
-- publishes the robot position and velocity with a custom message (containing x, y, vel_x, vel_z), reading them from on the topic ????????????????  , this informations are retrieved by a subscriber to the topic */odom*. To handle the callback of the subscriber, the nodes launches a dedicated thread (for the ros::spin() instruction). 
+- publishes the robot position and velocity with a custom message (containing x, y, vel_x, vel_z). These informations are retrieved by a subscriber to the topic */odom*. To handle the callback of the subscriber, the nodes launches a dedicated thread (for the ros::spin() instruction). 
 
 ## Node 2: last_target_srv.cpp
 
