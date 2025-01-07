@@ -6,6 +6,7 @@
 #include <assignment_2_part1/state_pos_vel.h>		// including custom message
 #include <nav_msgs/Odometry.h>				// including odometry message
 #include <geometry_msgs/Point.h>			// including point message
+#include <thread>					// include for the thread 
 
 // GLOBAL VARIABLES ----------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +23,6 @@ ros::Publisher robot_state_pub;
 
 void feedback_callback(const assignment_2_2024::PlanningFeedbackConstPtr &feedback)
 {
-	ros::spinOnce(); 		// Allow processing of subscriber callbacks
 	// setting threshold
 	float threshold = 0.5;
 	if ((abs(feedback->actual_pose.position.x - x_last_goal) < threshold) && (abs(feedback->actual_pose.position.y - y_last_goal) < threshold) && (printNum == 0))
@@ -77,6 +77,12 @@ int main (int argc, char **argv)
 	// waiting for the action server to start
 	ac.waitForServer(); //will wait for infinite time
   
+  	// Creating a thread for ros::spin()
+  	std::thread spinThread([]() 
+  	{
+      		ros::spin();
+  	});
+  	
 	while (ros::ok())
 	{
 		ROS_INFO("\n\nEnter 1 to set a new goal,\nenter 2 to cancel the current goal,\nenter 0 to exit:\n");
@@ -84,19 +90,61 @@ int main (int argc, char **argv)
 		// saving the user's answer in 'userChoice'
   		int userChoice; 
   		std::cin >> userChoice;
+  		
+  		// input control on user choice (1, 2, 3) 
+  		if (std::cin.fail()) 
+        	{
+                	std::cin.clear();
+                	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        		userChoice = 5;
+        	}		
+  		
   
   		if (userChoice == 1)	// new goal
   		{
   			// newGoal message creation
   			assignment_2_2024::PlanningGoal newGoal;
   	
-  			// asking the user to set the new goal:coord x
-  			ROS_INFO("\n\nSet the x coordinate of the new goal:\n");
-  			std::cin >> newGoal.target_pose.pose.position.x;		
+  			// input control on chosen target coordinates
+  						
+  			while(true)
+          		{		
+             	 		// asking the user to set the new goal:coord x
+  				ROS_INFO("\n\nSet the x coordinate of the new goal:\n");
+  				std::cin >> newGoal.target_pose.pose.position.x;
+  				
+              			if (std::cin.fail()) 
+                		{
+                        		std::cin.clear();
+                        		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        		ROS_INFO("Input not valid: enter a number.\n");
 
-			// asking the user to set the new goal:coord y
-  			ROS_INFO("\n\nSet the y coordinate of the new goal:\n");
-  			std::cin >> newGoal.target_pose.pose.position.y;
+                		}
+                		else
+                		{
+                    			break;
+                		}
+            		}
+  			
+  			while(true)
+          		{		
+             	 		// asking the user to set the new goal:coord y
+  				ROS_INFO("\n\nSet the y coordinate of the new goal:\n");
+  				std::cin >> newGoal.target_pose.pose.position.y;
+  			
+              			if (std::cin.fail()) 
+                		{
+                        		std::cin.clear();
+                        		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        		ROS_INFO("Input not valid: enter a number.\n");
+
+                		}
+                		else
+                		{
+                    			break;
+                		}
+            		}
+  		
   		
   			// updating global variables: goal coordinates
 			x_last_goal = newGoal.target_pose.pose.position.x;
