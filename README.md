@@ -3,7 +3,8 @@
 To run the code the following things are needed:
 - ROS noetic
 - *package assignment_2_2024*
-After cloning the nedded packages in the workspace and after sourcing the right setup files, the workspace has to be compiled with *catkin make*.
+
+After cloning the needed packages in the workspace and after sourcing the right setup files, the workspace has to be compiled with *catkin make*.
 
 Then to run the nodes you have to go in the workspace folder and run the following command:
 
