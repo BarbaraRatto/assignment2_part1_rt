@@ -1,0 +1,5 @@
+<map id="main" name="main">
+<area shape="rect" id="node1" title="Main function to initialize and run the last target service node." alt="" coords="5,42,60,69"/>
+<area shape="rect" id="node2" href="$last__target__srv_8cpp.html#aef0e4a21fdacb0d29280fa6ce2f16ca3" title="Callback function for the last_target_coord service." alt="" coords="121,5,267,47"/>
+<area shape="rect" id="node3" href="$last__target__srv_8cpp.html#aa49050ddb04365e3f5ba55d454d95d03" title="Callback function for the /target_coordinates topic." alt="" coords="108,71,280,98"/>
+</map>

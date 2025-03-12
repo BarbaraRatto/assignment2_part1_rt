@@ -1,3 +1,31 @@
+/**
+* \file action_server_client.cpp
+* \brief This node implements an action client for the action server in the package 'assignment_2_2024'.
+* \author Barbara Ratto
+* \version 1.0
+* \date 12/03/25
+*
+* \details
+*
+* **Subscribes to**: <BR>
+* - /odom
+*
+* **Publishes to**: <BR>
+* - /robot_state
+* - /target_coordinates
+*	
+* **Action server**: <BR>
+* - /reaching_goal	
+*
+* **Description**: <BR>
+* This node allows the user to:
+* - Set a new goal.
+* - Cancel the current goal.
+* - Monitor when a goal is reached.
+* - Publish the robot's position and velocity using a custom message.
+* 
+**/
+
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
@@ -10,17 +38,35 @@
 
 // GLOBAL VARIABLES ----------------------------------------------------------------------------------------------------------------------------------------------------
 
+/**
+ * \brief Global variable for x-coordinate of the last goal.
+ */
 float x_last_goal;
+/**
+ * \brief Global variable for y-coordinate of the last goal.
+ */
 float y_last_goal;
+/**
+ * \brief Global variable that is 0 if the current goal has not been reached yet. it is used to print only once the 'goal reached' message.
+ */
 int printNum = 0;
 
-// creating a publisher to publish the robot state
+/**
+ * \brief Publisher for the robot state.
+ */
 ros::Publisher robot_state_pub;
 
 
 
 // feedback_callback: CALLBACK FUNCTION ------------------------------------------------------------------------------------------------------------------------
 
+/**
+ * \brief Callback function to handle feedback from the action server.
+ * 
+ * It prints a message when the robot is sufficiently close to the goal (within a threshold).
+ *
+ * \param feedback Pointer to the feedback message from the action server.
+ */
 void feedback_callback(const assignment_2_2024::PlanningFeedbackConstPtr &feedback)
 {
 	// setting threshold
@@ -36,7 +82,13 @@ void feedback_callback(const assignment_2_2024::PlanningFeedbackConstPtr &feedba
 
 // odometry_callback: CALLBACK FUNCTION ------------------------------------------------------------------------------------------------------------------------
 
-// Callback for the /odom topic
+/**
+ * \brief Callback function for the /odom topic.
+ *
+ * It publishes the robot's position and velocity using a custom message.
+ *
+ * \param msg Pointer to the odometry message containing the robot's position and velocity.
+ */
 void odometry_callback(const nav_msgs::Odometry::ConstPtr &msg)
 {
 	// creating the custom message
@@ -55,6 +107,17 @@ void odometry_callback(const nav_msgs::Odometry::ConstPtr &msg)
 
 // MAIN ----------------------------------------------------------------------------------------------------------------------------------------------------
 
+/**
+ * \brief Main function to run the action client node.
+ *
+ * This function initializes the ROS node, sets up publishers and subscribers,
+ * creates an action client, and provides a user interface to set/cancel goals.
+ * A thread is used to run the spin command. This allows the node to listen for incoming messages (and eventually handle callback functions), while the UI is running independently.
+ *
+ * \param argc Number of input arguments (if any).
+ * \param argv Pointer to array of arguments (if any). 
+ * \return 0 on successful execution
+ */
 int main (int argc, char **argv)
 {
 	ros::init(argc, argv, "action_server_client");
@@ -68,7 +131,6 @@ int main (int argc, char **argv)
   	
 	// defining & initializing the publisher for the target coordinates
 	ros::Publisher target_coord_pub = nh.advertise<geometry_msgs::Point>("/target_coordinates", 10);
-
 
 	// creating the action server client
 	actionlib::SimpleActionClient<assignment_2_2024::PlanningAction> ac("/reaching_goal", true);
@@ -105,6 +167,8 @@ int main (int argc, char **argv)
   			// newGoal message creation
   			assignment_2_2024::PlanningGoal newGoal;
   	
+  			printNum = 0;		
+  			
   			// input control on chosen target coordinates
   						
   			while(true)
