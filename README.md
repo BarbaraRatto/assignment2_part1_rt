@@ -1,3 +1,7 @@
+# Doxygen documentation 
+At the following link:
+https://barbararatto.github.io/assignment2_part1_rt/
+
 # How to run the code
 
 To run the code the following things are needed:
